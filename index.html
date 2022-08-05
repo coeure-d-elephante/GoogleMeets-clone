@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Vroom Chat</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="main.css">
+	</head>
+
+	<body>
+		<h1>Vroom Chat 🏎</h1>
+		<p>
+			Creates a WebRTC Peer Connection and shares video between two peers without a signaling server 
+		</p>
+		<p>
+			Download and  modify this file to accomplish the following:
+			<ol>
+				<li>Add an audio track to the video stream</li>
+				<li>Create a video stream of the local screen using getDisplayMedia</li>
+				<li>Add a video element, alongside the local video, that displays the screen</li>
+				<li>Add the shared screen video track to the peer media stream</li>
+				<li>When a remote connection is made, display the remote shared screen alongside the remote video</li>
+			</ol>
+		</p>
+		<p>
+			The final page should have 2 video elements displaying the local camera and local screen, 
+			and two video elements displaying the remote video and remote screen.<br/>
+			The peers should be able to see each other's cameras, screens and to speak with each other.<br/>
+			Any additional modifications will be considered.
+		</p>
+	
+		<hr/>
+
+			<div id="videos">
+				<!-- user1 -->
+				<video class="video-player" id="localVideo" autoplay playsinline></video>
+				<div id="buttons">
+					<button class="button" id="localScreen">+ Screen Share</button>
+				</div>		
+				<!-- user2 -->
+					<video class="video-player" id="remoteVideo" autoplay playsinline></video>			
+			</div>
+	
+		<div>
+			<p>
+				If you are the host, copy the offer and send it to the remote:
+				<button id="createOffer">create</button><input type="text" id="localOffer" placeholder="local offer"/><br/>
+				Then paste the remote answer and accept it:
+				<input type="text" id="remoteAnswer" placeholder="remote answer"/><button id="acceptAnswer">accept</button>
+			</p>
+			<p>
+				if you are the remote, paste the hosts offer and accept it:
+				<input type="text" id="remoteOffer" placeholder="remote offer"><button id="acceptOffer">accept</button><br/>
+				Then copy your answer and send it to the host:
+				<input type="text" id="localAnswer" placeholder="local answer"/>
+			</p>
+		</div>
+
+		<script src="/main.js">
+			'use strict';	
+		</script>
+
+	</body>
+</html>
