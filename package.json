@@ -1,0 +1,22 @@
+{
+  "name": "welcome-ware-peer-to-peer-video",
+  "version": "1.0.0",
+  "description": "take home project",
+  "main": "main.js",
+  "scripts": {
+    "test": "devStart"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coeure-d-elephante/Welcome-Ware-Peer-to-Peer-Video.git"
+  },
+  "author": "steph javier",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/coeure-d-elephante/Welcome-Ware-Peer-to-Peer-Video/issues"
+  },
+  "homepage": "https://github.com/coeure-d-elephante/Welcome-Ware-Peer-to-Peer-Video#readme",
+  "dependencies": {
+    "webrtc-adapter": "^8.1.1"
+  }
+}

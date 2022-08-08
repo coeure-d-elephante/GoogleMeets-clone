@@ -2,6 +2,13 @@ let localStream;
 let remoteStream;
 let peerConnection;
 
+const servers = {'iceServers': [
+  {
+    'url': 'stun:stun.l.google.com:19302'
+  }
+]};
+
+
 const mediaStreamConstraints = {
   video: true, audio: false
 }
@@ -20,11 +27,12 @@ localScreen.addEventListener("click", () => {
   navigator.mediaDevices.getDisplayMedia(mediaStreamConstraints)
 })
 
-// const createOffer = async () => {
-//   peerConnection = new RTCPeerConnection(servers)
+const createOffer = async () => {
+  //new => live instance
+  peerConnection = new RTCPeerConnection(servers)
 
-//   remoteStream = new MediaStream()
-//   document.getElementById('remoteVideo').srcObject = remoteStream
+  remoteStream = new MediaStream()
+  document.getElementById('remoteVideo').srcObject = remoteStream
 
 //   localStream.getTracks().forEach((track) => {
 //     peerConnection.addTrack(track, localStream)
@@ -42,11 +50,11 @@ localScreen.addEventListener("click", () => {
 //     }
 //   }
 
-//   let offer = await peerConnection.createOffer()
-//   await peerConnection.setLocalDescription(offer)
+  let offer = await peerConnection.createOffer()
+  await peerConnection.setLocalDescription(offer)
 
-//   console.log("offer", offer)
-// }
+  console.log("offer", offer)
+}
 
 init();
 
