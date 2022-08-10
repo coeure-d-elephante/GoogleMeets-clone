@@ -4,7 +4,8 @@
   "description": "take home project",
   "main": "main.js",
   "scripts": {
-    "test": "devStart"
+    "test": "scripts test",
+    "start": "PORT=3001main.js"
   },
   "repository": {
     "type": "git",
