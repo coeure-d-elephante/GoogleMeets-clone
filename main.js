@@ -1,150 +1,192 @@
-const APP_ID = "202bddbdec1949a69e911c7b1ba5388c"
+const servers = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]};
 
-let token = null;
-let uid = String(Math.floor(Math.random() * 1000))
+let peerConnection = new RTCPeerConnection(servers);
 
-let client;
-let channel;
-
-let queryString = window.location.search
-let urlParams = new URLSearchParams(queryString)
-let roomId = urlParams.get('room')
-
-let localStream;
-let remoteStream;
-let peerConnection;
-
-const servers = {'iceServers': [
-  {
-    'url': 'stun:stun.l.google.com:19302'
-  }
-]};
-
-const mediaStreamConstraints = {
-  video: true, audio: true
-}
+const mediaStreamConstraints = {video: true, audio: true};
+const offerOptions = {offerToReceiveVideo:1}; //boolean for 1= true? 0=false?
 
 const init = async () => {
-  client = await AgoraRTM.createInstance(APP_ID)
-  await client.login({uid, token})
+	peerConnection;
+	console.log('Created peer connection');
 
-  //index.html?room=234234
-  channel = client.createChannel('main')
-  await channel.join()
+//local video
+	const peerMediaStream = new MediaStream();
+			peerConnection.addStream(peerMediaStream);
 
-  channel.on('MemberJoined', handleUserJoined)
+			navigator.mediaDevices.getUserMedia(mediaStreamConstraints)
+				.then((mediaStream) => {
+				
+					localVideo.srcObject = mediaStream;
 
-  client.on('MessageFromPeer', handleMessageFromPeer)
-
-  localStream = await navigator.mediaDevices.getUserMedia(mediaStreamConstraints)
-  document.getElementById('localVideo').srcObject = localStream
+					for (const track of mediaStream.getTracks())
+						peerMediaStream.addTrack(track);
+					}
+				)
+				.catch(logError);
 }
+	
+			//elements from HTML
+			const localVideo = document.getElementById('localVideo');
+			const remoteVideo = document.getElementById('remoteVideo');
 
-const handleMessageFromPeer = async (message, MemberId) => {
-  message = JSON.parse(message.text)
-  if(message.type === 'offer') {
-    createAnswer(MemberId, message.offer)
-  }
-  if(message.type === 'answer') {
-    addAnswer(message.answer)
-  }
-  if(message.type === 'candidate') {
-    if(peerConnection){
-      peerConnection.addIceCandidate(message.candidate)
-    }
-  }
-}
+			const localOffer = document.getElementById('localOffer');
+			const remoteOffer = document.getElementById('remoteOffer');
+			const createOffer = document.getElementById('createOffer');
+			const acceptOffer = document.getElementById('acceptOffer');
 
-const handleUserJoined = async (MemberId) => {
-  console.log('A new user:', MemberId)
-  createOffer(MemberId);
-}
+			const localAnswer = document.getElementById('localAnswer');
+			const remoteAnswer = document.getElementById('remoteAnswer');
+			const acceptAnswer = document.getElementById('acceptAnswer');
 
-const createPeerConnection = async (MemberId) => {
-  peerConnection = new RTCPeerConnection(servers)
+			//	assign click handlers to each button
+			createOffer.addEventListener('click', offerCreate);
+			acceptOffer.addEventListener('click', offerAccept);
+			acceptAnswer.addEventListener('click', answerAccept);
+					
+			peerConnection.addEventListener('icecandidate', handleConnection);
+			peerConnection.addEventListener('addstream', gotRemoteMediaStream);
+				
+			function handleConnection(event) {
 
-  remoteStream = new MediaStream()
-  document.getElementById('remoteVideo').srcObject = remoteStream
+				const connection = event.target;
+				const iceCandidate = event.candidate;
+				
+				if (iceCandidate == null)
+				{
+					const description = connection.localDescription;
+					const descriptionType = description.type;
+					const descriptionString = JSON.stringify(description);
+					
+					if (descriptionType == 'offer') {
 
-  if(!localStream){
-    localStream = await navigator.mediaDevices.getUserMedia(mediaStreamConstraints)
-    document.getElementById('localVideo').srcObject = localStream
-  }
+						localOffer.value = descriptionString;
+						
+					} else {
+						
+						localAnswer.value = descriptionString;
+					}
+				}
+			}
+					
+			function gotRemoteMediaStream(event) {
 
-  localStream.getTracks().forEach((track) => {
-    peerConnection.addTrack(track, localStream)
-  })
+				const mediaStream = event.stream;
+				remoteVideo.srcObject = mediaStream;
+				console.log('remote peer connection received remote stream')
+			}
 
-  //event listener for when remote peer adds track
-  peerConnection.ontrack = (e) => {
-    e.streams[0].getTracks().forEach((track) => {
-      remoteStream.addTrack(track)
-    })
-  }
+			function offerCreate() {
 
-  peerConnection.onicecandidate = async (e) => {
-    if(e.candidate){
-      client.sendMessageToPeer({text:JSON.stringify({'type': 'candidate', 'candidate': e.candidate})}, MemberId)
+				peerConnection.createOffer(offerOptions)
+					.then(createdOffer)
+					.catch(logError);
+			}
 
-    }
-  }
+			function createdOffer(description) {
 
-}
+				peerConnection.setLocalDescription(description)
+					.then(() => {console.log('local peer description set');})
+					.catch(logError);
+			}
 
-const createOffer = async (MemberId) => {
-  await createPeerConnection(MemberId)
 
-  let offer = await peerConnection.createOffer()
-  await peerConnection.setLocalDescription(offer)
+			function offerAccept() {
 
-  client.sendMessageToPeer({text:JSON.stringify({'type': 'offer', 'offer': offer})}, MemberId)
-}
+				const description = JSON.parse(remoteOffer.value);
+				
+				peerConnection.setRemoteDescription(description)
+					.then(() => {console.log('remote peer offer accepted');})
+					.catch(logError);
+					
+				peerConnection.createAnswer()
+					.then(createdAnswer)
+					.catch(logError);
+				
+			}
 
-const createAnswer = async (MemberId, offer) => {
-  await createPeerConnection(MemberId)
+			function createdAnswer(description) {
 
-  await peerConnection.setRemoteDescription(offer)
+				peerConnection.setLocalDescription(description)
+					.then(() => {console.log('remote peer answered');})
+					.catch(logError);
+			}
 
-  let answer = await peerConnection.createAnswer()
-  await peerConnection.setLocalDescription(answer)
+			function answerAccept() {
 
-  client.sendMessageToPeer({text:JSON.stringify({'type': 'answer', 'answer': answer})}, MemberId)
-}
+				const description = JSON.parse(remoteAnswer.value);
 
-const addAnswer = async (answer) => {
-  if(!peerConnection.currentRemoteDescription){
-    peerConnection.setRemoteDescription(answer)
-  }
-}
+				console.log(description)
 
+				peerConnection.setRemoteDescription(description)
+					.then(() => {console.log('Local peer remote description set');})
+					.catch(logError);
+				
+			}
+					
+					
+			function logError(error) {
+
+				console.log(error.toString());
+			}
+		
 //====================Screen Share===============
 const localScreen = document.getElementById("localScreen");
 const remoteScreen = document.getElementById("remoteScreen");
+const startLocalScreen = document.getElementById("startLocalScreen");
+const stopLocalScreen = document.getElementById("stopLocalScreen");
+const startRemoteScreen = document.getElementById("startRemoteScreen");
+const stopRemoteScreen = document.getElementById("stopRemoteScreen");
 
 //returns screen share media
-const startScreenShare = async (displayMediaOptions) => {
-  let captureStream;
+// const startScreenShare = async (displayMediaOptions) => {
+//   let captureStream;
 
-  try{
-    captureStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
-  } catch (err) {
-    console.error(`Error, ${err}`);
+//   try{
+//     captureStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+//   } catch (err) {
+//     console.error(`Error, ${err}`);
+//   }
+//   return captureStream;
+//   }
+
+  async function startCapture(displayMediaOptions) {
+    try {
+      localScreen.srcObject = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+    } catch (err) {
+      console.error(`Error: ${err}`);
+    }
   }
-  return captureStream;
+
+  function stopCapture(e) {
+    let tracks = localScreen.srcObject.getTracks();
+    tracks.forEach((track) => track.stop());
+    localScreen.srcObject = null;
   }
 
   //plays screen share media
-  const setLocalStream = (captureStream) => {
-    localScreen.srcObject = captureStream
-    localScreen.muted = true;
-    localScreen.onplay()
-  }
+  // const setLocalStream = (captureStream) => {
+  //   localScreen.srcObject = captureStream
+  //   localScreen.muted = true;
+  //   localScreen.onplay()
+  // }
 
 
+startLocalScreen.addEventListener("click", (e) => {
+  startCapture();
+}, false)
 
-const localScreenBtn = document.getElementById("startLocalScreen");
-localScreenBtn.addEventListener("click", startScreenShare)
+stopLocalScreen.addEventListener("click", (e) => {
+  stopCapture();
+}, false)
 
-init();
+startRemoteScreen.addEventListener("click", (e) => {
+  startCapture();
+}, false)
 
-//=======================
+stopRemoteScreen.addEventListener("click", (e) => {
+  stopCapture();
+}, false)
+
+init()
+		
+	

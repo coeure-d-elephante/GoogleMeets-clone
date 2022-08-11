@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "scripts test",
-    "start": "PORT=3001main.js"
+    "start": "main.js"
   },
   "repository": {
     "type": "git",

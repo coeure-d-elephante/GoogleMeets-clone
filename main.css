@@ -4,10 +4,17 @@
   gap: 2em;
 }
 
-#shareVideo {
+#share-screen {
   border: 1px solid #999;
-  width: 98%;
-  max-width: 860px;
+  width: 50%;
+  height: 100px;
+  max-width: 500px;
+}
+
+.screen-share-player{
+  background-color: black;
+  width: 150%;
+  height: 250px;
 }
 .video-player{
   background-color: black;
@@ -21,11 +28,3 @@
   width: 20%;
   height: 50px;
 }
-
-/* #localVideoShare{
-  display: none;
-}
-
-#remoteVideoShare{
-  display: none;
-} */
