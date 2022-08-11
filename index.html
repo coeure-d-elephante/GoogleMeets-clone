@@ -31,14 +31,30 @@
 
 			<div id="videos">
 				<!-- user1 -->
-				<video class="video-player" id="localVideo" autoplay playsinline></video>
+				<video class="video-player" id="localVideo" controls autoplay playsinline></video>
+				<div id="shareVideo">
+					<video class="screen-share" id="localScreen"  autoplay></video>
+				</div>
+
 				<div id="buttons">
-					<button class="button" id="localScreen">+ Screen Share</button>
-				</div>		
-				<!-- user2 -->
-					<video class="video-player" id="remoteVideo" autoplay playsinline></video>			
+					<button  id="startLocalScreen">+ Screen Share</button>
+					<button  id="stopLocalScreen">Stop Capture</button>
+				</div>	
 			</div>
-	
+			 
+			<br/>
+
+			<div id="videos">
+				<!-- user2 -->
+				<video class="video-player" id="remoteVideo" controls autoplay playsinline></video>			
+				<div id="shareVideo">
+					<video class="screen-share" id="remoteScreen"  autoplay></video>
+				</div>
+				<div id="buttons">
+					<button  id="startRemoteScreen">+ Screen Share</button>
+					<button  id="stopRemoteScreen">Stop Capture</button>
+				</div>		
+			</div>
 		<div>
 			<p>
 				If you are the host, copy the offer and send it to the remote:

@@ -1,7 +1,7 @@
 const APP_ID = "202bddbdec1949a69e911c7b1ba5388c"
 
 let token = null;
-let uid = String(Math.floor(Math.random() * 10000))
+let uid = String(Math.floor(Math.random() * 1000))
 
 let client;
 let channel;
@@ -117,11 +117,34 @@ const addAnswer = async (answer) => {
   }
 }
 
-const localScreen =  document.getElementById('localScreen');
+//====================Screen Share===============
+const localScreen = document.getElementById("localScreen");
+const remoteScreen = document.getElementById("remoteScreen");
 
-localScreen.addEventListener("click", () => {
-  navigator.mediaDevices.getDisplayMedia(mediaStreamConstraints)
-})
+//returns screen share media
+const startScreenShare = async (displayMediaOptions) => {
+  let captureStream;
+
+  try{
+    captureStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+  } catch (err) {
+    console.error(`Error, ${err}`);
+  }
+  return captureStream;
+  }
+
+  //plays screen share media
+  const setLocalStream = (captureStream) => {
+    localScreen.srcObject = captureStream
+    localScreen.muted = true;
+    localScreen.onplay()
+  }
+
+
+
+const localScreenBtn = document.getElementById("startLocalScreen");
+localScreenBtn.addEventListener("click", startScreenShare)
+
 init();
 
 //=======================

@@ -4,6 +4,11 @@
   gap: 2em;
 }
 
+#shareVideo {
+  border: 1px solid #999;
+  width: 98%;
+  max-width: 860px;
+}
 .video-player{
   background-color: black;
   width: 100%;
@@ -12,6 +17,15 @@
 
 .button{
   color: teal;
+  grid-template-columns: 1fr 1 fr;
   width: 20%;
   height: 50px;
 }
+
+/* #localVideoShare{
+  display: none;
+}
+
+#remoteVideoShare{
+  display: none;
+} */
