@@ -242,18 +242,6 @@
       const startRemoteScreen = document.getElementById("startRemoteScreen");
       const stopRemoteScreen = document.getElementById("stopRemoteScreen");
 
-      //returns screen share media
-      // const startScreenShare = async (displayMediaOptions) => {
-      //   let captureStream;
-
-      //   try{
-      //     captureStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
-      //   } catch (err) {
-      //     console.error(`Error, ${err}`);
-      //   }
-      //   return captureStream;
-      //   }
-
       async function startCapture(displayMediaOptions) {
         try {
           localScreen.srcObject = await navigator.mediaDevices.getDisplayMedia(
@@ -285,12 +273,6 @@
         tracks.forEach((track) => track.stop());
         localScreen.srcObject = null;
       }
-      //plays screen share media
-      // const setLocalStream = (captureStream) => {
-      //   localScreen.srcObject = captureStream
-      //   localScreen.muted = true;
-      //   localScreen.onplay()
-      // }
 
       startLocalScreen.addEventListener(
         "click",
